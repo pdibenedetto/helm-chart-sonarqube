@@ -1,6 +1,143 @@
 # SonarQube Chart Changelog
 All changes to this chart will be documented in this file.
 
+## [2025.1.0]
+* Update Chart's version to 2025.1.0
+* Update ingress-nginx subchart to 4.11.3
+* Support Kubernetes v1.32
+* Remove the default passcode provided with `monitoringPasscode`
+* Support Openshift v4.17
+
+## [10.8.1]
+* Update Chart's version to 10.8.1
+* Upgrade SonarQube Server to 10.8.1
+
+## [10.8.0]
+* Update Chart's version to 10.8.0
+* Upgrade SonarQube Server to 10.8.0
+* Support the installation of the Oracle JDBC Driver
+* Support Kubernetes v1.31
+* Update the Chart's icon with the SonarQube Server logo
+* Fix ENV variables not fetched when using extraConfig.configmaps
+* Support Gateway on different namespace in HTTPRoute
+* Change `ingress.ingressClassName` default, set it to `nginx` if `nginx.enabled` or `ingress-nginx.enabled`
+* Ensure that ConfigMap resources are not created for `initFS` and `initSysctl` if not needed
+* Ensure the Pod will stop at `init` stage if init_sysctl.sh failed to modify kernel parameters
+* Replace the example images in initContainers, initSysctl and initFs from `busybox:1.36` to `ubuntu:24.04`, which are commented out by default
+* Make the `automountServiceAccountToken` configurable with `serviceAccount.automountToken` in PodSpec
+* Deprecate `ApplicationNodes` in favor of `applicationNodes`, fixing naming convention typo
+* Replace helm top level '$' by '.' when not necessary
+* Deprecate `elasticsearch.bootstrapchecks`, `sonarqubeFolder`, `jdbcOverwrite.jdbcPassword` and `terminationGracePeriodSeconds`
+* Deprecate `account`, `curlContainerImage`, `adminJobAnnotations`
+* Deprecate `logging.jsonOutput` in favor of the ENV var SONAR_LOG_JSONOUTPUT or the sonar.properties's sonar.log.jsonOutput
+
+## [10.7.0]
+* Update Chart's version to 10.7.0
+* Upgrade SonarQube to 10.7.0
+* Support Kubernetes v1.30
+* Upgrade ingress-nginx dependency to 4.10.1
+* Deprecate `jdbcOverwrite.enable` in favor of `jdbcOverwrite.enabled`
+* Enable the setup of ReadOnlyRootFilesystem in the security contexts
+* Support basic chart installation on Openshift
+* Support Openshift Route
+* Fix networkPolicy.additionalPolicys typo
+* Support install-plugin and prometheusExporter proxy variables in secret
+* Support GatewayAPI HttpRoute
+* Support Openshift SCCv2 by default when Openshift.enabled=true
+* Deprecate Openshift.createSCC
+* Support the TLS communication between App and Search nodes
+* Support additional CA Certificate as ConfigMap instead of Secret only
+* Changed default value for caCerts.image
+* Document the upgrade process when autoscaling is enabled
+* Fix openshift change-admin-password-hook Job SecurityContext failure
+* Support SONAR_OPENSHIFT telemetry env_var
+* Update helm chart repo path in sources
+* Support IS_HELM_AUTOSCALING_ENABLED telemetry env_var and rename SONAR_OPENSHIFT to IS_HELM_OPENSHIFT_ENABLED
+* Remove socketTimeout from jdbcOverwrite.jdbcUrl's default value
+* Refactor Route to be subparameter of OpenShift
+* Make OpenShift.createSCC false by default
+* Support ApplicationNodes.extraVolumes and ApplicationNodes.extraVolumeMounts
+* Ensure kubernetes.io/version label is smaller than 63 chars
+
+## [10.6.0]
+* Upgrade SonarQube to 10.6.0
+* Update Chart's version to 10.6.0
+* Fix the env-var templating when sourcing from secrets
+* Fix the postgresql chart's repository link
+* Calibrate probes' initialDelaySeconds
+* Define HorizontalPodAutoscaler for the app deployment
+* Add support for overriding liveness/readiness probe logic in the app nodes
+* Add ApplicationNodes.affinity, ApplicationNodes.tolerations, searchNodes.affinity, searchNode.tolerations, ApplicationNodes.nodeSelector, searchNodes.nodeSelector
+* Define affinity, tolerations, and nodeSelector parameters for App and Search nodes
+
+## [10.5.0]
+* Upgrade SonarQube to 10.5.0
+* Update Chart's version to 10.5.0
+* Update nginx-ingress-controller dependency to version 4.9.1
+* Fix the ingress.ingressClassName not being evaluated
+* Fix searchNodes.securityContext and ApplicationNodes.securityContext not being evaluated
+* Fix duplicated `ApplicationNodes.resources` parameters in the README
+* Add `gcp_marketplace` value, implementing compatibility with google cloud marketplace app
+* Set `automountServiceAccountToken` to false in pod's specifications
+* Update default `ApplicationNodes.resources` and `searchNodes.resources` to values matching better default Xmx and Xms of the SonarQube processes.
+* Make `ephemeral-storage` resource's limits and requests configurable for the SonarQube App and Search containers
+* Set memory and cpu limits for the test container
+* Fix `searchAuthentication` probes failure by enforcing basic auth on wget
+* Remove outdated doc about persistency
+* Deprecate nginx.enabled in favor of ingress-nginx.enabled, to match with subchart config block
+* Deprecate `ApplicationNodes.prometheusMonitoring.podMonitor.namespace`
+* Instantiate `monitoring-web` and `monitoring-ce` endpoints when the `ApplicationNodes.prometheusExporter` is enabled
+* Take `sonarWebContext` into account for the `PodMonitor` path
+* Fix duplicated env_var in Pods causing deployment issue (`SONAR_WEB_CONTEXT`,`SONAR_WEB_JAVAOPTS`,`SONAR_CE_JAVAOPTS`)
+
+## [10.4.0]
+* Upgrade SonarQube to 10.4.0
+* Update Chart's version to 10.4.0
+* Improve the description of deprecated `ApplicationNodes.jvmOpts` and `ApplicationNodes.jvmCeOpts` values
+* Run the initSysctl init-container as root to prevent 'permission denied' issues
+* Add revisionHistoryLimit configuration for SonarQube application Deployment ReplicaSets
+* Introduce `ApplicationNodes.podDisruptionBudget` and `searchNodes.podDisruptionBudget` and deprecate `ApplicationNodes.podDistributionBudget` and `searchNodes.podDistributionBudget`.
+* Update the security contexts to use root as group ID
+* Fix empty ingress annotations in values
+
+## [10.3.0]
+* Upgrade SonarQube to 10.3.0
+* Update Chart's version to 10.3.0
+* Update default images to the latest versions
+* Remove the nginx-proxy-body annotation when nginx is disabled
+* Enable post-upgrade in the change-admin-password hook
+* Separate annotations and labels for app and search pods
+* Update default ContainerSecurityContext, InitContainerSecurityContext and postgresql.securityContext to match restricted podSecurityStandard
+* Update initFs default securityContext to match baseline podSecurityStandard
+* Add securityContext feature to change admin password Job
+* Remove unneeded if condition for Sysctl initContainer
+* Update default image of initContainers to sonarqube image, allowing for faster loading time and less external images needed
+* Support Kubernetes v1.28
+* Avoid duplicate SONAR_WEB_SYSTEMPASSCODE secrets
+* Deprecate embedded PostgreSQL
+* Update nginx-ingress-controller dependency to version 4.8.3, please carefully read the changelog of this new major version.
+* Remove duplicated 'proxy-body-size' from ingress annotation.
+
+## [10.2.0]
+* Update SonarQube to 10.2.0
+* Update Chart's version to 10.2.0
+* Update curl image to 8.2.0
+* `ApplicationNodes.readinessProbe.sonarWebContext`, `ApplicationNodes.startupProbe.sonarWebContext`, `ApplicationNodes.livenessProbe.sonarWebContext` and `account.sonarWebContext` are deprecated, please use `sonarWebContext` at the value top level.
+* Set the minimum values for PodDisruptionBudget
+* Updates ingress-nginx dependency to 4.7.1
+
+## [10.1.0]
+* Update SonarQube to 10.1.0
+* Support Kubernetes v1.27 while dropping v1.23
+* Changed default test process to wget, using sonarqube image as default
+* Fix wrong condition between initFs and concat-properties
+* Update Chart's version to 10.1.0
+* Fix liveness probe for SonarQube Application to detect when a failure occurs.
+
+## [10.0.0]
+* Update SonarQube to 10.0.0
+* Helm chart versioning will now follow the SonarQube product versioning
+
 ## [8.3.1]
 * Make `jvmOpts` and `jvmCeOpts` not override env vars and sonar properties
 
@@ -197,7 +334,7 @@ All changes to this chart will be documented in this file.
 * added link to community support forum
 
 ## [0.1.6]
-* fixed wrong scc user reference if name was explicitly set 
+* fixed wrong scc user reference if name was explicitly set
 
 ## [0.1.5]
 * fixed serviceaccount logic

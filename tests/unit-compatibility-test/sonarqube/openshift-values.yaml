@@ -1,0 +1,6 @@
+edition: enterprise
+
+OpenShift:
+  enabled: true
+  route:
+    enabled: true

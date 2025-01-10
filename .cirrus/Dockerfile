@@ -1,45 +1,51 @@
 ARG CIRRUS_AWS_ACCOUNT
-FROM ${CIRRUS_AWS_ACCOUNT}.dkr.ecr.eu-central-1.amazonaws.com/base:j11-latest as tools
+FROM ${CIRRUS_AWS_ACCOUNT:-275878209202}.dkr.ecr.eu-central-1.amazonaws.com/base:j11-latest AS tools
 
-FROM docker:20.10
+FROM docker:27.4
 
 USER root
 
-ARG HELM_VERSION=3.6.3
-ARG KUBECTL_VERSION=1.21.0
-ARG CHART_TESTING_VERSION=3.8.0
-ARG CHART_TESTING_HASHSUM="e1235c0d856729aabe63e77198d07fbf90243132bfa82b6bec41878d179ad034"
-ARG KIND_VERSION=0.11.1
-ARG KIND_HASHSUM="949f81b3c30ca03a3d4effdecda04f100fa3edc07a28b19400f72ede7c5f0491"
-ARG YAMLLINT_VERSION=1.30.0
-ARG YAMALE_VERSION=3.0.6
-ARG AH_VERSION=1.2.0
-ARG AH_CHECKSUM="30d3b080c5e65530d6089813233f10a881820361e2b9b32fb7b744466ff74d27"
-ARG YQ_VERSION=3.4.1
-ARG YQ_CHECKSUM="adbc6dd027607718ac74ceac15f74115ac1f3caef68babfb73246929d4ffb23c"
+ARG HELM_VERSION=3.16.3
+ARG KUBECTL_VERSION=1.32.0
+ARG CHART_TESTING_VERSION=3.11.0
+ARG CHART_TESTING_HASHSUM="38914f285ce309f86a876522640a27b57840a435d3480195f0878e104f1e8044"
+ARG YAMLLINT_VERSION=1.35.1
+ARG YAMALE_VERSION=5.2.1
+ARG YQ_VERSION=4.44.5
+ARG YQ_CHECKSUM="638c4b251c49201fc94b598834b715f8f1c6e9b1854d2820772d2c79f0289002"
+ARG KUBECONFORM_VERSION=0.6.7
+ARG KUBECONFORM_CHECKSUM="95f14e87aa28c09d5941f11bd024c1d02fdc0303ccaa23f61cef67bc92619d73"
+ARG CHART_VERIFIER_VERSION=1.13.8
+ARG CHART_VERIFIER_CHECKSUM="1ed190a3aa4f961269e59f9596408415761ab368d761a08eae2960a84d957352"
+ARG OPENSHIFT_CLI_VERSION=4.17.8
+ARG OPENSHIFT_CLI_CHECKSUM="f2dc55e02e53bb6140d6c79ce74b66f685f74f48dd3f368b2cde3674a4710185"
 
 ENV HELM_BASE_URL="https://get.helm.sh"
 ENV HELM_TAR_FILE="helm-v${HELM_VERSION}-linux-amd64.tar.gz"
 ENV HELM_HASH_SUM_FILE="helm-v${HELM_VERSION}-linux-amd64.tar.gz.sha256sum"
+ENV PATH=/usr/bin/google-cloud-sdk/bin:${PATH}
 
 RUN apk add --update --no-cache \
-    ca-certificates \
+    aws-cli \
     bash \
-    jq \
-    moreutils \
+    ca-certificates \
     curl \
+    gcompat \
     git \
     gnupg \
+    go \
+    jq \
     libc6-compat \
+    libstdc++ \
+    moreutils \
     openssh-client \
     py3-pip \
     py3-wheel \
     python3 && \
-    pip install --upgrade pip==21.0.1
+    pip install --break-system-packages --upgrade pip==24.2
 
-
-RUN pip install "yamllint==${YAMLLINT_VERSION}" && \
-    pip install "yamale==${YAMALE_VERSION}"
+RUN pip install --break-system-packages "yamllint==${YAMLLINT_VERSION}" && \
+    pip install --break-system-packages "yamale==${YAMALE_VERSION}"
 
 RUN set -eux; \
     curl -sL ${HELM_BASE_URL}/${HELM_TAR_FILE} -o ${HELM_TAR_FILE} ; \
@@ -62,12 +68,6 @@ RUN set -eux; \
     rm kubectl.sha256
 
 RUN set -eux; \
-    curl -LO https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64 ; \
-    echo "${KIND_HASHSUM}  kind-linux-amd64" | sha256sum -c ; \
-    chmod +x ./kind-linux-amd64 ; \
-    mv ./kind-linux-amd64 /usr/bin/kind
-
-RUN set -eux; \
     curl -LO https://github.com/helm/chart-testing/releases/download/v${CHART_TESTING_VERSION}/chart-testing_${CHART_TESTING_VERSION}_linux_amd64.tar.gz ; \
     echo "${CHART_TESTING_HASHSUM}  chart-testing_${CHART_TESTING_VERSION}_linux_amd64.tar.gz" | sha256sum -c ; \
     tar -xf chart-testing_${CHART_TESTING_VERSION}_linux_amd64.tar.gz ; \
@@ -79,19 +79,35 @@ RUN set -eux; \
     rm chart-testing_${CHART_TESTING_VERSION}_linux_amd64.tar.gz 
 
 RUN set -eux; \
-    curl -LO https://github.com/artifacthub/hub/releases/download/v${AH_VERSION}/ah_${AH_VERSION}_linux_amd64.tar.gz ; \
-    echo "${AH_CHECKSUM}  ah_${AH_VERSION}_linux_amd64.tar.gz" | sha256sum -c ; \
-    tar -xf ah_${AH_VERSION}_linux_amd64.tar.gz ; \
-    chmod +x ./ah ; \
-    mv ./ah /usr/bin/ah ; \
-    rm LICENSE
-
-RUN set -eux; \
-    curl -LO https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64 ; \
+    curl -LO https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 ; \
     echo "${YQ_CHECKSUM}  yq_linux_amd64" | sha256sum -c ; \
     chmod +x ./yq_linux_amd64 ; \
     mv ./yq_linux_amd64 /usr/bin/yq
 
+RUN set -eux; \
+    curl -LO https://github.com/yannh/kubeconform/releases/download/v${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz ; \
+    echo "${KUBECONFORM_CHECKSUM}  kubeconform-linux-amd64.tar.gz" | sha256sum -c ; \
+    tar -xf kubeconform-linux-amd64.tar.gz ; \
+    chmod +x ./kubeconform ; \
+    mv ./kubeconform /usr/bin/kubeconform ; \
+    rm kubeconform-linux-amd64.tar.gz
+
+RUN set -eux; \
+    curl -LO https://github.com/redhat-certification/chart-verifier/releases/download/${CHART_VERIFIER_VERSION}/chart-verifier-${CHART_VERIFIER_VERSION}.tgz ; \
+    echo "${CHART_VERIFIER_CHECKSUM}  chart-verifier-${CHART_VERIFIER_VERSION}.tgz" | sha256sum -c ; \
+    tar -xf chart-verifier-${CHART_VERIFIER_VERSION}.tgz ; \
+    chmod +x ./chart-verifier ; \
+    mv ./chart-verifier /usr/bin/chart-verifier ; \
+    rm chart-verifier-${CHART_VERIFIER_VERSION}.tgz
+
+RUN set -eux; \
+    curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OPENSHIFT_CLI_VERSION}/openshift-client-linux.tar.gz ; \
+    echo "${OPENSHIFT_CLI_CHECKSUM}  openshift-client-linux.tar.gz" | sha256sum -c ; \
+    tar -xf openshift-client-linux.tar.gz ; \
+    chmod +x ./oc ; \
+    mv ./oc /usr/bin/oc ; \
+    rm openshift-client-linux.tar.gz kubectl README.md
+
 COPY --from=tools /usr/local/bin/cirrus-env /usr/local/bin/cirrus-env
-COPY --from=tools /usr/bin/gh /usr/local/bin/gh
-COPY --from=tools /home/sonarsource/.m2/settings-public.xml /root/.m2/settings-public.xml
+COPY --from=tools /usr/local/bin/gh /usr/local/bin/gh
+COPY --from=tools /home/sonarsource/.m2/settings-public-auth.xml /root/.m2/settings-public.xml

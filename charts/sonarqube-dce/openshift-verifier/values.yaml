@@ -1,0 +1,29 @@
+OpenShift:
+  enabled: true
+  route:
+    enabled: true
+
+postgresql:
+  securityContext:
+    enabled: false
+  containerSecurityContext:
+    enabled: false
+
+searchNodes:
+  replicaCount: 1
+  image:
+    repository: "sonarsource/sonarqube"
+    tag: "10.8.1-datacenter-search"
+    pullSecrets:
+      - name: pullsecret
+
+ApplicationNodes:
+  replicaCount: 1
+  jwtSecret: "dZ0EB0KxnF++nr5+4vfTCaun/eWbv6gOoXodiAMqcFo="
+  image:
+    repository: "sonarsource/sonarqube"
+    tag: "10.8.1-datacenter-app"
+    pullSecrets:
+      - name: pullsecret
+
+monitoringPasscode: "test"
