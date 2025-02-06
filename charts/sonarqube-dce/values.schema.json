@@ -1,7 +1,102 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
+        "networkPolicy": {
+            "type": "object",
+            "properties": {
+                "additionalNetworkPolicys": {
+                    "type": "object",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) Please use `networkPolicy.additionalNetworkPolicies` instead"
+                }
+            }
+        },
+        "OpenShift":
+        {
+            "type": "object",
+            "properties": {
+                "createSCC": {
+                    "type": "boolean",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) custom SCC are no longer required, the chart is compatible with default restricted SCCv2"
+                }
+            }
+        },
+        "nginx": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) Please use `ingress-nginx.enabled` instead"
+                }
+            }
+        },
+        "postgresql": {
+            "type": "object",
+            "deprecated": true,
+            "$comment": "(DEPRECATED) Please use an external database instead of the embedded one. Please visit https://artifacthub.io/packages/helm/sonarqube/sonarqube#production-use-case for more information"
+        },
+        "jdbcOverwrite": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) Please use `jdbcOverwrite.enabled` instead"
+                },
+                "jdbcPassword": {
+                    "type": "string",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) Please use `jdbcOverwrite.jdbcSecretName` along with `jdbcOverwrite.jdbcSecretPasswordKey` instead"
+                }
+            }
+        },
+        "account": {
+            "type": "object",
+            "deprecated": true,
+            "$comment": "(DEPRECATED) Please use `setAdminPassword` instead",
+            "properties": {
+                "adminPassword": {
+                    "type": "string",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) please use `setAdminPassword.newPassword` at the value top level"
+                },
+                "currentAdminPassword": {
+                    "type": "string",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) please use `setAdminPassword.currentPassword` at the value top level"
+                },
+                "adminPasswordSecretName": {
+                    "type": "string",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) please use `setAdminPassword.passwordSecretName` at the value top level"
+                },
+                "sonarWebContext": {
+                    "type": "string",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) please use sonarWebContext at the value top level"
+                }
+            }
+        },
+        "curlContainerImage":
+        {
+            "type": "string",
+            "deprecated": true,
+            "$comment": "(DEPRECATED) please use `setAdminPassword.image` at the value top level"
+        },
+        "adminJobAnnotations":
+        {
+            "type": "object",
+            "deprecated": true,
+            "$comment": "(DEPRECATED) please use `setAdminPassword.annotations` at the value top level"
+        },
         "ApplicationNodes": {
+            "type": "object",
+            "deprecated": true,
+            "$comment": "(DEPRECATED) Please use `applicationNodes` with lowercase a instead"
+        },
+        "applicationNodes": {
             "properties": {
                 "jvmOpts": {
                     "type": "string",
@@ -12,6 +107,106 @@
                     "type": "string",
                     "deprecated": true,
                     "$comment": "(DEPRECATED) Please use SONAR_CE_JAVAOPTS or sonar.ce.javaOpts"
+                },
+                "livenessProbe": {
+                    "type": "object",
+                    "properties": {
+                        "sonarWebContext": {
+                            "type": "string",
+                            "deprecated": true,
+                            "$comment": "(DEPRECATED) please use sonarWebContext at the value top level"
+                        }
+                    }
+                },
+                "startupProbe": {
+                    "type": "object",
+                    "properties": {
+                        "sonarWebContext": {
+                            "type": "string",
+                            "deprecated": true,
+                            "$comment": "(DEPRECATED) please use sonarWebContext at the value top level"
+                        }
+                    }
+                },
+                "readinessProbe": {
+                    "type": "object",
+                    "properties": {
+                        "sonarWebContext": {
+                            "type": "string",
+                            "deprecated": true,
+                            "$comment": "(DEPRECATED) please use sonarWebContext at the value top level"
+                        }
+                    }
+                },
+                "prometheusMonitoring": {
+                    "type": "object",
+                    "properties": {
+                        "podMonitor": {
+                            "type": "object",
+                            "properties": {
+                                "namespace": {
+                                    "type": "string",
+                                    "deprecated": true,
+                                    "$comment": "(DEPRECATED) This value should not be set, as the PodMonitor's namespace has to match the Release Namespace"
+                                }
+                            }
+                        }
+                    }
+                },
+                "podDisruptionBudget": {
+                    "type": "object",
+                    "deprecated": true,
+                    "$comment": "PodDisruptionBudget for the Application Nodes"
+                },
+                "podDistributionBudget": {
+                    "type": "object",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) Please use ApplicationNodes.podDisruptionBudget"
+                }
+            }
+        },
+        "searchNodes": {
+            "properties": {
+                "podDisruptionBudget": {
+                    "type": "object",
+                    "deprecated": false,
+                    "$comment": "PodDisruptionBudget for the Search Nodes"
+                },
+                "podDistributionBudget": {
+                    "type": "object",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) Please use SearchNodes.podDisruptionBudget"
+                }
+            }
+        },
+        "sonarqubeFolder":
+        {
+            "type": "string",
+            "deprecated": true,
+            "$comment": "(DEPRECATED) This value will is no longer required and will be droped in future releases"
+        },
+        "terminationGracePeriodSeconds": {
+            "type": "integer",
+            "deprecated": true,
+            "$comment": "(DEPRECATED) This value is not used in the templates"
+        },
+        "elasticsearch": {
+            "type": "object",
+            "properties": {
+                "bootstrapChecks": {
+                    "type": "boolean",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) This value is not used in the templates"
+                }
+            }
+        },
+        "logging": {
+            "type": "object",
+            "properties": {
+                "jsonOutput": {
+                    "type": "boolean",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) Please use the ENV var SONAR_LOG_JSONOUTPUT or the sonar.properties's sonar.log.jsonOutput"
                 }
             }
         }

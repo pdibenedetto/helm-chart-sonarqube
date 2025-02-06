@@ -1,0 +1,6 @@
+community:
+  enabled: true
+  buildNumber: "12345"
+
+image:
+  tag: ""

@@ -1,3 +1,5 @@
+edition: enterprise
+
 sonarProperties:
   prop: yes
   otherProp: false
@@ -7,3 +9,11 @@ sonarSecretProperties: some-secret
 sonarSecretKey: "settings-encryption-secret"
 elasticsearch:
   bootstrapChecks: false
+
+extraVolumeMounts:
+  - name: "extra-volume"
+    mountPath: "/extra-volume-mount"
+    readOnly: true
+extraVolumes:
+  - name: "extra-volume"
+    emptyDir: {}

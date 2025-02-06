@@ -1,5 +1,8 @@
+edition: enterprise
+
 ingress:
   enabled: true
+  ingressClassName: "user-based"
   hosts:
   - name: sonarqube.your-org.com
     path: /
